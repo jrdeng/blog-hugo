@@ -71,7 +71,7 @@ def generate_site():
     if os.path.isdir(public_dir):
         shutil.rmtree(public_dir, True)
     os.mkdir(public_dir)
-    subprocess.run('hugo')
+    subprocess.run('/usr/local/bin/hugo')
 
 
 def deploy():
