@@ -1,3 +1,6 @@
 [submodule "themes/maupassant"]
 	path = themes/maupassant
 	url = https://github.com/rujews/maupassant-hugo
+[submodule "github-issue-fetcher"]
+	path = github-issue-fetcher
+	url = https://github.com/jrdeng/github-issue-fetcher.git
