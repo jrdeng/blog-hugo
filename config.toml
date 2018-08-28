@@ -1,4 +1,25 @@
-baseURL = "http://example.org/"
-languageCode = "en-us"
-title = "My New Hugo Site"
+baseURL = "https://jrdeng.github.io"
+languageCode = "zh-CN"
+title = "BEYONDNESS"
 theme = "maupassant"
+
+[author]
+  name = "jrdeng"
+
+[params]
+  author = "jrdeng"
+  subtitle = "Just another blog"
+  keywords = "Python,github,hugo,blog"
+  description = ""
+
+[[menu.main]]
+    identifier = "archives"
+    name = "归档"
+    url = "/archives/"
+    weight = 2
+
+  [[menu.main]]
+    identifier = "about"
+    name = "关于"
+    url = "/about/"
+    weight = 99
