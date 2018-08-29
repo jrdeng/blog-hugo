@@ -45,17 +45,13 @@ def write_hugo_header(md, issue):
 
 def write_hugo_body(md, issue):
     md.write('{}\n\n'.format(issue.body))
-    md.write('## Comments\n\n')
-    md.write('to leave a comment, please go to [this issue]({}) on github.\n\n'.format(issue.url))
+    md.write('---\n\n')
+    md.write('## 评论 （移步到 [github]({}) 上留言）\n\n'.format(issue.url))
 
     # write comments in MD
-    first_comment = True
     for comment in issue.comments:
-        if first_comment:
-            first_comment = False
-        else:
-            md.write('<hr />\n\n')
-        md.write('<img src="{}" alt="{}" width="20" height="20"/> <b>{} at {}:</b>\n\n'.format(comment.author.avatarUrl, comment.author.login, comment.author.login, datetime_to_beijing(comment.createdAt)))
+        md.write('---\n\n')
+        md.write('<img src="{}" alt="{}" width="20" height="20"/> <b>{} 发表于 {}</b>\n\n'.format(comment.author.avatarUrl, comment.author.login, comment.author.login, datetime_to_beijing(comment.createdAt).replace('T', ' ')))
         md.write('{}\n\n'.format(comment.body))
 
 
