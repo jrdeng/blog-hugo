@@ -5,7 +5,7 @@ import os
 import getopt
 import shutil
 import subprocess
-import datetime
+from datetime import datetime, timedelta
 
 blog_dir = os.path.dirname(os.path.realpath(__file__))
 sys.path.append('{}{}github-issue-fetcher'.format(blog_dir, os.sep))
@@ -25,10 +25,15 @@ def normalize_issue_title(title):
     return r
 
 
+def datetime_to_beijing(iso_str):
+    dt = datetime.strptime(iso_str, "%Y-%m-%dT%H:%M:%SZ")
+    return (dt + timedelta(hours=8)).isoformat()
+
+
 def write_hugo_header(md, issue):
     md.write('---\n')
     md.write('title: "{}"\n'.format(issue.title))
-    md.write('date: {}\n'.format(issue.createdAt))
+    md.write('date: {}\n'.format(datetime_to_beijing(issue.createdAt)))
     md.write('slug: "{}"\n'.format(issue.id))
     if len(issue.labels) > 0:
         md.write('tags: [\n') # tags begin
@@ -50,7 +55,7 @@ def write_hugo_body(md, issue):
             first_comment = False
         else:
             md.write('<hr />\n\n')
-        md.write('<img src="{}" alt="{}" width="20" height="20"/> <b>{} at {}:</b>\n\n'.format(comment.author.avatarUrl, comment.author.login, comment.author.login, comment.createdAt))
+        md.write('<img src="{}" alt="{}" width="20" height="20"/> <b>{} at {}:</b>\n\n'.format(comment.author.avatarUrl, comment.author.login, comment.author.login, datetime_to_beijing(comment.createdAt)))
         md.write('{}\n\n'.format(comment.body))
 
 
@@ -92,7 +97,7 @@ def deploy():
     os.chdir('public')
     subprocess.run('git status'.split(' '))
     subprocess.run('git add .'.split(' '))
-    now = datetime.datetime.now()
+    now = datetime.now()
     now_str = str(now)[:19]
     subprocess.run(['git', 'commit', '-m', 'rebuild site {}'.format(now_str)])
     subprocess.run('git push'.split(' '))
