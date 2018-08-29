@@ -49,9 +49,9 @@ def write_hugo_body(md, issue):
         if first_comment:
             first_comment = False
         else:
-            md.write('------\n\n')
-        md.write('<img src="{}" alt="{}" width="20" height="20"/> {} at {}:\n\n'.format(comment.author.avatarUrl, comment.author.login, comment.author.login, comment.createdAt))
-        md.write('\t{}\n\n'.format(comment.body)) 
+            md.write('<hr />\n\n')
+        md.write('<img src="{}" alt="{}" width="20" height="20"/> <b>{} at {}:</b>\n\n'.format(comment.author.avatarUrl, comment.author.login, comment.author.login, comment.createdAt))
+        md.write('{}\n\n'.format(comment.body))
 
 
 def generate_md(issue_list, output_dir):
