@@ -5,6 +5,7 @@ import os
 import getopt
 import shutil
 import subprocess
+import filecmp
 from datetime import datetime, timedelta
 
 blog_dir = os.path.dirname(os.path.realpath(__file__))
@@ -67,12 +68,49 @@ def generate_md(issue_list, output_dir):
             write_hugo_body(md, issue)
 
 
+def are_dirs_same(dir1, dir2):
+    dirs_cmp = filecmp.dircmp(dir1, dir2)
+
+    if len(dirs_cmp.left_only) > 0 or len(dirs_cmp.right_only) > 0 or len(dirs_cmp.funny_files) > 0:
+        print('has left/right only entry(ies)...')
+        return False
+
+    (_, mismatch, errors) =  filecmp.cmpfiles(dir1, dir2, dirs_cmp.common_files, shallow=False)
+    if len(mismatch) > 0 or len(errors) > 0:
+        print('has mismatch or error')
+        return False
+
+    for common_dir in dirs_cmp.common_dirs:
+        new_dir1 = os.path.join(dir1, common_dir)
+        new_dir2 = os.path.join(dir2, common_dir)
+        if not are_dirs_same(new_dir1, new_dir2):
+            return False
+    return True
+
+
 def generate_site():
+    has_changed = False
+
     public_dir = 'public'
+    public_dir_prev = 'public.prev'
     if os.path.isdir(public_dir):
-        shutil.rmtree(public_dir, True)
-    os.mkdir(public_dir)
+        # rename previous public folder
+        if os.path.isdir(public_dir_prev):
+            shutil.rmtree(public_dir_prev, True)
+        shutil.move(public_dir, public_dir_prev)
+        # remove .git dir
+        shutil.rmtree('{}{}.git'.format(public_dir_prev, os.sep), True)
+    else:
+        print('no previous build...')
+        has_changed = True
+
     subprocess.run('/usr/local/bin/hugo')
+
+    # compare public folder with previous public
+    if has_changed:
+        return True
+    else:
+        return not are_dirs_same(public_dir, public_dir_prev)
 
 
 def deploy():
@@ -154,11 +192,14 @@ def main():
 
     # generate static website
     print('generating static website...')
-    generate_site()
+    has_changed = generate_site()
 
     # deploy to github
-    print('deploying to github...')
-    deploy()
+    if has_changed:
+        print('deploying new website to github...')
+        deploy()
+    else:
+        print('website not changed, just ignore.')
 
     # switch back workding dir <<<<<<<<<<
     os.chdir(cwd)
