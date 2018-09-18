@@ -1,6 +1,6 @@
 baseURL = "https://jrdeng.github.io"
 languageCode = "zh-CN"
-title = "BEYONDNESS"
+title = "无名的旅人"
 theme = "maupassant"
 
 [author]
@@ -8,7 +8,7 @@ theme = "maupassant"
 
 [params]
   author = "jrdeng"
-  subtitle = "Just another blog"
+  subtitle = "匆匆这半生，他乡月照人。鬓白无处止，浪里浮萍根。"
   keywords = "Python,github,hugo,blog"
   description = ""
 
