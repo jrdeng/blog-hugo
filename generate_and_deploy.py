@@ -33,7 +33,7 @@ def datetime_to_beijing(iso_str):
 
 def write_hugo_header(md, issue):
     md.write('---\n')
-    md.write('title: "{}"\n'.format(issue.title))
+    md.write('title: "{}"\n'.format(issue.title.replace("\"", "\\\"")))
     md.write('date: {}+08:00\n'.format(datetime_to_beijing(issue.createdAt)))
     md.write('slug: "{}"\n'.format(issue.id))
     if len(issue.labels) > 0:
