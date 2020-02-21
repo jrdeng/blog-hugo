@@ -8,7 +8,7 @@ theme = "maupassant"
 
 [params]
   author = "jrdeng"
-  subtitle = "JUST DO IT! -- 来做个IT男吧!"
+  subtitle = "JUST DO IT! -- 来啊，搞IT啊！"
   keywords = "Python,github,hugo,blog"
   description = ""
 
