@@ -18,7 +18,8 @@ def usage():
     print('OPTIONS:')
     print('\t-t|--token\tgithub token for GraphQL')
     print('\t-o|--owner\trepo owner(login)')
-    print('\t-r|--repo\trepo name to fetch issue')
+    print('\t-r|--repo\trepo name(without .git suffix) to fetch issue')
+    print('\t-g|--gen\tpath to the blog generator(hugo)')
 
 
 def normalize_issue_title(title):
@@ -88,7 +89,7 @@ def are_dirs_same(dir1, dir2):
     return True
 
 
-def generate_site():
+def generate_site(hugo_exe):
     has_changed = False
 
     public_dir = 'public'
@@ -104,7 +105,7 @@ def generate_site():
         print('no previous build...')
         has_changed = True
 
-    subprocess.run('/usr/local/bin/hugo')
+    subprocess.run(hugo_exe)
 
     # compare public folder with previous public
     if has_changed:
@@ -113,12 +114,12 @@ def generate_site():
         return not are_dirs_same(public_dir, public_dir_prev)
 
 
-def deploy():
+def deploy(owner, repo):
     # clone repo
-    repo_dir = 'jrdeng.github.io'
+    repo_dir = repo
     if os.path.isdir(repo_dir):
         shutil.rmtree(repo_dir, True)
-    subprocess.run('git clone git@github.com:jrdeng/jrdeng.github.io.git {}'.format(repo_dir).split(' '))
+    subprocess.run('git clone git@github.com:{}/{}.git {}'.format(owner, repo, repo_dir).split(' '))
 
     # move '.git' to 'public', so we make 'public' as the new repo
     shutil.move('{}{}.git'.format(repo_dir, os.sep), 'public')
@@ -142,14 +143,15 @@ def deploy():
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'ht:o:r:', ['help', 'token=', 'owner=', 'repo='])
+        opts, args = getopt.getopt(sys.argv[1:], 'ht:o:r:g:', ['help', 'token=', 'owner=', 'repo=', 'gen='])
     except getopt.GetoptError as err:
         print(err)
         usage()
         exit(2)
     token = None                # must be set
-    owner = 'jrdeng'            # default owner
-    repo = 'jrdeng.github.io'   # default repository
+    owner = None                # github username
+    repo = None                 # github issue repo(whitout .git suffix), for example: jrdeng.github.io
+    hugo_exe = None             # hugo path
     for o, a in opts:
         if o == '-h':
             usage()
@@ -160,17 +162,28 @@ def main():
             owner = a
         elif o in ('-r', '--repo'):
             repo = a
+        elif o in ('-g', '--gen'):
+            hugo_exe = a
         else:
             usage()
             assert False, 'unhandled option'
     if token is None:
-        print('token is not specified, try to get it from ENV...')
+        print('token is not specified, try to get it from ENV: GITHUB_GQL_TOKEN')
         token_env = 'GITHUB_GQL_TOKEN'
         try:
             token = os.environ[token_env]
         except KeyError as err:
             print('{} is not in ENV? exit.'.format(token_env))
             exit(2)
+    if owner is None:
+        print('owner must be set')
+        exit(2)
+    if repo is None:
+        print('repo must be set')
+        exit(2)
+    if hugo_exe is None:
+        print('generator(hugo_exe) must be set')
+        exit(2)
 
     # fetch issues from github
     print('fetching issues from github...')
@@ -192,12 +205,12 @@ def main():
 
     # generate static website
     print('generating static website...')
-    has_changed = generate_site()
+    has_changed = generate_site(hugo_exe)
 
     # deploy to github
     if has_changed:
         print('deploying new website to github...')
-        deploy()
+        deploy(owner, repo)
     else:
         print('website not changed, just ignore.')
 
