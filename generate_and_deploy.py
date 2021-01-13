@@ -18,8 +18,9 @@ def usage():
     print('OPTIONS:')
     print('\t-t|--token\tgithub token for GraphQL')
     print('\t-o|--owner\trepo owner(login)')
-    print('\t-r|--repo\trepo name(without .git suffix) to fetch issue')
+    print('\t-r|--repo\trepo name(without .git suffix) to fetch issue and push the site')
     print('\t-g|--gen\tpath to the blog generator(hugo)')
+    print('\t-l|--local\tgenerate and deploy site without pulling new issues(useing local MD, -t will be ignored)')
 
 
 def normalize_issue_title(title):
@@ -51,9 +52,16 @@ def write_hugo_body(md, issue):
     md.write('## 评论 （移步到 [github]({}) 上留言）\n\n'.format(issue.url))
 
     # write comments in MD
+    comment_header_template = '''
+<table>
+  <tr>
+    <td><img src="{}" alt="{}" width="32" height="32"></td>
+    <td style="font-weight:bold;text-align:left">{} 发表于 {}</td>
+  </tr>
+</table>
+    '''
     for comment in issue.comments:
-        md.write('---\n\n')
-        md.write('<img src="{}" alt="{}" width="20" height="20"/> <b>{} 发表于 {}</b>\n\n'.format(comment.author.avatarUrl, comment.author.login, comment.author.login, datetime_to_beijing(comment.createdAt).replace('T', ' ')))
+        md.write(comment_header_template.format(comment.author.avatarUrl, comment.author.login, comment.author.login, datetime_to_beijing(comment.createdAt).replace('T', ' ')))
         md.write('{}\n\n'.format(comment.body))
 
 
@@ -143,7 +151,7 @@ def deploy(owner, repo):
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'ht:o:r:g:', ['help', 'token=', 'owner=', 'repo=', 'gen='])
+        opts, args = getopt.getopt(sys.argv[1:], 'lht:o:r:g:', ['local', 'help', 'token=', 'owner=', 'repo=', 'gen='])
     except getopt.GetoptError as err:
         print(err)
         usage()
@@ -152,6 +160,7 @@ def main():
     owner = None                # github username
     repo = None                 # github issue repo(whitout .git suffix), for example: jrdeng.github.io
     hugo_exe = None             # hugo path
+    local = False
     for o, a in opts:
         if o == '-h':
             usage()
@@ -164,10 +173,12 @@ def main():
             repo = a
         elif o in ('-g', '--gen'):
             hugo_exe = a
+        elif o in ('-l', '--local'):
+            local = True
         else:
             usage()
             assert False, 'unhandled option'
-    if token is None:
+    if not local and token is None:
         print('token is not specified, try to get it from ENV: GITHUB_GQL_TOKEN')
         token_env = 'GITHUB_GQL_TOKEN'
         try:
@@ -185,23 +196,25 @@ def main():
         print('generator(hugo_exe) must be set')
         exit(2)
 
-    # fetch issues from github
-    print('fetching issues from github...')
-    issue_list = fetcher.fetch_issues(token, owner, repo)
-    issue_num = len(issue_list)
-    print('issue_num: {}'.format(issue_num))
-
-    if issue_num == 0:
-        print('fetch_issues() returned empty!')
-        exit(1)
-
     # switch working dir >>>>>>>>>>
     cwd = os.getcwd()
     os.chdir(blog_dir)
 
-    # generate markdown files for hugo
-    print('generating markdown files for hugo...')
-    generate_md(issue_list, 'content/post')
+    if not local:
+        # fetch issues from github
+        print('fetching issues from github...')
+        issue_list = fetcher.fetch_issues(token, owner, repo)
+        issue_num = len(issue_list)
+        print('issue_num: {}'.format(issue_num))
+
+        if issue_num == 0:
+            print('fetch_issues() returned empty!')
+            os.chdir(cwd)
+            exit(1)
+
+        # generate markdown files for hugo
+        print('generating markdown files for hugo...')
+        generate_md(issue_list, 'content/post')
 
     # generate static website
     print('generating static website...')
