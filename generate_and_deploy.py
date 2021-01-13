@@ -59,10 +59,10 @@ def write_hugo_body(md, issue):
     <td style="font-weight:bold;text-align:left">{} 发表于 {}</td>
   </tr>
 </table>
-    '''
+'''
     for comment in issue.comments:
         md.write(comment_header_template.format(comment.author.avatarUrl, comment.author.login, comment.author.login, datetime_to_beijing(comment.createdAt).replace('T', ' ')))
-        md.write('{}\n\n'.format(comment.body))
+        md.write('\n{}\n\n'.format(comment.body))
 
 
 def generate_md(issue_list, output_dir):
