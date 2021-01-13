@@ -23,3 +23,9 @@ theme = "maupassant"
     name = "关于"
     url = "/about/"
     weight = 99
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+
