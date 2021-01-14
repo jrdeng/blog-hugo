@@ -49,17 +49,16 @@ def write_hugo_header(md, issue):
 
 def write_hugo_body(md, issue):
     md.write('{}\n\n'.format(issue.body))
-    md.write('---\n\n')
-    md.write('## 评论 （移步到 [github]({}) 上留言）\n\n'.format(issue.url))
+    md.write('<hr style="width: 100%"/>\n\n')
+    md.write('<h1 style="font-size: 1.5em;color:#555;font-weight: bold;">评论 （移步到 <a href="{}">github</a> 上留言）</h1>\n'.format(issue.url))
 
     # write comments in MD
     comment_header_template = '''
-<table>
-  <tr>
-    <td><img src="{}" alt="{}" width="32" height="32"></td>
-    <td style="font-weight:bold;text-align:left">{} 发表于 {}</td>
-  </tr>
-</table>
+<div>
+<img src="{}" alt="{}" style="width:32px;height:32px;float:left"/>
+<span style="font-weight:bold;text-align:left;float:left;line-height:60px;">{} 发表于 {}</span>
+<div style="clear:both"/>
+</div>
 '''
     for comment in issue.comments:
         md.write(comment_header_template.format(comment.author.avatarUrl, comment.author.login, comment.author.login, datetime_to_beijing(comment.createdAt).replace('T', ' ')))
