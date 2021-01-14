@@ -21,6 +21,7 @@ def usage():
     print('\t-r|--repo\trepo name(without .git suffix) to fetch issue and push the site')
     print('\t-g|--gen\tpath to the blog generator(hugo)')
     print('\t-l|--local\tgenerate and deploy site without pulling new issues(useing local MD, -t will be ignored)')
+    print('\t-d|--dry\tdry run, just generate site, but do not deploy it')
 
 
 def normalize_issue_title(title):
@@ -151,7 +152,7 @@ def deploy(owner, repo):
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'lht:o:r:g:', ['local', 'help', 'token=', 'owner=', 'repo=', 'gen='])
+        opts, args = getopt.getopt(sys.argv[1:], 'dlht:o:r:g:', ['dry', 'local', 'help', 'token=', 'owner=', 'repo=', 'gen='])
     except getopt.GetoptError as err:
         print(err)
         usage()
@@ -161,6 +162,7 @@ def main():
     repo = None                 # github issue repo(whitout .git suffix), for example: jrdeng.github.io
     hugo_exe = None             # hugo path
     local = False
+    dry_run = False
     for o, a in opts:
         if o == '-h':
             usage()
@@ -175,6 +177,8 @@ def main():
             hugo_exe = a
         elif o in ('-l', '--local'):
             local = True
+        elif o in ('-d', '--dry'):
+            dry_run = True
         else:
             usage()
             assert False, 'unhandled option'
@@ -220,12 +224,13 @@ def main():
     print('generating static website...')
     has_changed = generate_site(hugo_exe)
 
-    # deploy to github
-    if has_changed:
-        print('deploying new website to github...')
-        deploy(owner, repo)
-    else:
-        print('website not changed, just ignore.')
+    if not dry_run:
+        # deploy to github
+        if has_changed:
+            print('deploying new website to github...')
+            deploy(owner, repo)
+        else:
+            print('website not changed, just ignore.')
 
     # switch back workding dir <<<<<<<<<<
     os.chdir(cwd)

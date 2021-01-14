@@ -2,6 +2,7 @@ baseURL = "https://jrdeng.github.io"
 languageCode = "zh-CN"
 title = "无名的旅人"
 theme = "maupassant"
+summaryLength = 26
 
 [author]
   name = "jrdeng"
@@ -18,11 +19,16 @@ theme = "maupassant"
     url = "/archives/"
     weight = 2
 
-  [[menu.main]]
+[[menu.main]]
     identifier = "about"
     name = "关于"
     url = "/about/"
     weight = 99
+
+[[params.links]]
+    name = "L2M2"
+    title = "L2M2"
+    url = "https://l2m2.top/"
 
 [markup]
   [markup.goldmark]
