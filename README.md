@@ -17,9 +17,10 @@ take [my blog](https://github.com/jrdeng/jrdeng.github.io) as a sample.
 ## Usage
 
 1. create your github page repo
-2. clone this repo (with all submodules)
-3. modify `config.toml` and themes as you want
-4. run `generate_and_deploy.py`
+2. get a `token` to access the GraphQL API to fetch the issues, please take a look at [Authenticating with GraphQL](https://developer.github.com/v4/guides/forming-calls/#authenticating-with-graphql)
+3. clone this repo (with all submodules), and install dependent Python3 modules and hugo
+4. modify `config.toml` and themes as you want
+5. run `generate_and_deploy.py`
 
 
 ```
