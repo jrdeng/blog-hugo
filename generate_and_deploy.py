@@ -53,7 +53,7 @@ def write_hugo_header(md, issue):
 def write_hugo_body(md, issue):
     md.write('{}\n\n'.format(issue.body))
     md.write('<hr style="width: 100%"/>\n\n')
-    md.write('<h1 style="font-size: 1.5em;color:#555;font-weight: bold;">评论：</h1>\n\n')
+    md.write('<h1 style="font-size: 1.5em;color:#555;font-weight: bold;">Comments: (on <a href="{}">github issue)</a></h1>\n\n'.format(issue.url))
 
     # write comments using utteranc.es~
     comment_template = '''
