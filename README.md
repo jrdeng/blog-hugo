@@ -24,4 +24,8 @@ OPTIONS:
         -d|--dry        dry run, just generate site, but do not deploy it
 ```
 
+## Features
 
+- write blog everywhere - just open the github issue in browser. (open, free, geek...)
+- comments of blog posts are also in the issues (using [utterances](https://utteranc.es/))
+- powered by [hugo](https://gohugo.io/)
