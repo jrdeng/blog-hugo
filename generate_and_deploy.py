@@ -12,6 +12,9 @@ blog_dir = os.path.dirname(os.path.realpath(__file__))
 sys.path.append('{}{}github-issue-fetcher'.format(blog_dir, os.sep))
 import fetcher
 
+g_owner = 'undefined'
+g_repo = 'undefined'
+
 
 def usage():
     print('usage: {} OPTIONS'.format(sys.argv[0]))
@@ -50,19 +53,19 @@ def write_hugo_header(md, issue):
 def write_hugo_body(md, issue):
     md.write('{}\n\n'.format(issue.body))
     md.write('<hr style="width: 100%"/>\n\n')
-    md.write('<h1 style="font-size: 1.5em;color:#555;font-weight: bold;">评论 （移步到 <a href="{}">github</a> 上留言）</h1>\n'.format(issue.url))
+    md.write('<h1 style="font-size: 1.5em;color:#555;font-weight: bold;">评论：</h1>\n\n')
 
-    # write comments in MD
-    comment_header_template = '''
-<div>
-<img src="{}" alt="{}" style="width:32px;height:32px;float:left"/>
-<span style="font-weight:bold;text-align:left;float:left;line-height:60px;">{} 发表于 {}</span>
-<div style="clear:both"/>
-</div>
+    # write comments using utteranc.es~
+    comment_template = '''
+<script src="https://utteranc.es/client.js"
+        repo="{}/{}"
+        issue-number="{}"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>
 '''
-    for comment in issue.comments:
-        md.write(comment_header_template.format(comment.author.avatarUrl, comment.author.login, comment.author.login, datetime_to_beijing(comment.createdAt).replace('T', ' ')))
-        md.write('\n{}\n\n'.format(comment.body))
+    md.write(comment_template.format(g_owner, g_repo, issue.id))
 
 
 def generate_md(issue_list, output_dir):
@@ -170,8 +173,12 @@ def main():
             token = a
         elif o in ('-o', '--owner'):
             owner = a
+            global g_owner
+            g_owner = owner
         elif o in ('-r', '--repo'):
             repo = a
+            global g_repo
+            g_repo = repo
         elif o in ('-g', '--gen'):
             hugo_exe = a
         elif o in ('-l', '--local'):
