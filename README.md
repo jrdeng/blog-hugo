@@ -5,6 +5,15 @@ fetch issues from github (using [github-issue-fetcher](https://github.com/jrdeng
 and generate static website (using [hugo](https://gohugo.io/)).
 
 
+## Features
+
+- write blog anywhere - just open the github issue in a browser. (open, free, geek...)
+- comments of blog posts are also in the issues (using [utterances](https://utteranc.es/))
+- powered by [hugo](https://gohugo.io/)
+
+take [my blog](https://github.com/jrdeng/jrdeng.github.io) as a sample.
+
+
 ## Usage
 
 1. create your github page repo
@@ -24,8 +33,4 @@ OPTIONS:
         -d|--dry        dry run, just generate site, but do not deploy it
 ```
 
-## Features
 
-- write blog everywhere - just open the github issue in browser. (open, free, geek...)
-- comments of blog posts are also in the issues (using [utterances](https://utteranc.es/))
-- powered by [hugo](https://gohugo.io/)
